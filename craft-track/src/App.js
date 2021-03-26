@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
 import firebase from './firebase.js';
-import Main from './Main';
+import Home from './Home';
 
 class App extends Component {
   render() {
     return (
       <div className='app'>
-        <Main />
+        <Home />
       </div>
     );
   }

@@ -25,39 +25,57 @@ export default class Main extends Component {
             },  
       },
     }
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
-  }
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+}
 
-  renderData(){
-      const dataCopy = this.state.data;
-      let renderedData = [];
-      const skillKeys = Object.keys(dataCopy);
-      for(const skill in skillKeys){
-         // alert([skillKeys[skill]]);
-         const currentSkill = skillKeys[skill];
-          renderedData.push(
-              
-              <p>{[currentSkill]}</p>
-          )
-          const projKeys = Object.keys(dataCopy[currentSkill])
-          for(const project in projKeys){
-              renderedData.push(
-                  <p>{dataCopy[currentSkill][projKeys[project]]}</p>
-              )
-          }
-      }
-      return renderedData;
+handleChange(){
 
-  }
+}
 
-  render(){
-      return(
-          <div>
-              <p>
-                  {this.renderData()}
-              </p>
-          </div>
-      );
-  }
+handleSubmit(){
+
+}
+
+renderData(){
+    const dataCopy = this.state.data;
+    let renderedData = [];
+    const skillKeys = Object.keys(dataCopy);
+    const FORMAT = ": "
+    for(const skill in skillKeys){
+        // alert([skillKeys[skill]]);
+        const currentSkill = skillKeys[skill];
+        renderedData.push(
+            
+            <p>{[currentSkill]}</p>
+        )
+        const projKeys = Object.keys(dataCopy[currentSkill])
+        for(const project in projKeys){
+            const currentProject = projKeys[project];
+            renderedData.push(
+            <p>
+                {currentProject}
+                {FORMAT}
+                {dataCopy[currentSkill][currentProject]}
+            </p>
+            )
+        }
+    }
+    return renderedData;
+
+}
+
+    render(){
+        return(
+            <div>
+                <form onSubmit={this.handleSubmit}>
+                    <input type="text" name="skill" placeholder="new skill" onChange={this.handleChange} value={this.state.skill} />
+                    <input type="text" name="project" placeholder="new project" onChange={this.handleChange} value={this.state.project} />
+                    <button>Add Skill</button>
+                </form>
+                    {this.renderData()}
+                
+            </div>
+        );
+    }
 }

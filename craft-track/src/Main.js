@@ -7,23 +7,8 @@ export default class Main extends Component {
     this.state = {
         skill: '',
         project: '',
-        data: {
-            'skill1': {
-                'project1': 4,
-                'project2': 7,
-                'project3': 1,
-            },
-            'skill2': {
-                'project1': 9,
-                'project2': 0,
-            },
-            'skill3': {
-            },
-            'skill4': {
-                'project1': 9,
-                'project2': 10,
-            },  
-      },
+        data: {},
+        ids: {},
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -51,26 +36,23 @@ export default class Main extends Component {
     componentDidMount() {
         const skillsRef = firebase.database().ref('skills');
         skillsRef.on('value', (snapshot) => {
-            let data = snapshot.val();
-            let newState = [];
-            for (let skill in data) {
-                
-                const name = data[skill].name;
-                const projects = data[skill].projects;
+            let dbData = snapshot.val();
+            let newData = {};
+            let newIds = {};
+            for (let skill in dbData) {
+                const name = dbData[skill].name;
+                const projects = dbData[skill].projects;
+                newIds[name] = skill;
                 if(projects){
-                    newState[name] = projects;
+                    newData[name] = projects;
                 }else{
-                    newState[name] = {};
+                    newData[name] = {};
                 }
-                
-            //     newState.push({
-            //         id: skill,
-            //         title: data[skill].title,
-            //         user: data[skill].user
-            //     });
             }
             this.setState({
-                data: newState,
+                data: newData,
+                ids: newIds,
+                
             });
         });
     }
@@ -81,11 +63,12 @@ export default class Main extends Component {
         const skillKeys = Object.keys(dataCopy);
         const FORMAT = ": "
         for(const skill in skillKeys){
-            // alert([skillKeys[skill]]);
             const currentSkill = skillKeys[skill];
             renderedData.push(
-                
-                <p>{[currentSkill]}</p>
+                <p>
+                    {[currentSkill]}
+                    <button onClick={() => this.removeItem(this.state.ids[currentSkill])}>Remove Item</button>
+                </p>
             )
             const projKeys = Object.keys(dataCopy[currentSkill])
             for(const project in projKeys){
@@ -102,6 +85,10 @@ export default class Main extends Component {
         return renderedData;
 
     }
+    removeItem(itemId) {
+        const itemRef = firebase.database().ref(`/skills/${itemId}`);
+        itemRef.remove();
+      }
 
     render(){
         return(
@@ -121,7 +108,7 @@ export default class Main extends Component {
                     {this.renderData()}
                 </div>
             </div>
-        
+            
         );
     }
 }

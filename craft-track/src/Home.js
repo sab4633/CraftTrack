@@ -8,10 +8,12 @@ export default class Main extends Component {
         skill: '',
         project: '',
         data: {},
-        ids: {},
+        skillIds: {},
+        projectIds: {},
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAddProject = this.handleAddProject.bind(this);
 }
 
     handleChange(e){
@@ -29,6 +31,22 @@ export default class Main extends Component {
         skillsRef.push(skill);
         this.setState({
             skill: '',
+        });
+    }
+
+    handleAddProject(e) {
+        e.preventDefault();
+        const skillId = this.state.skillIds[document.getElementById('skills-selector').value];
+        const projects = firebase.database().ref(`/skills/${skillId}/projects`);
+       // alert(projects);
+       
+        const newProject = {
+            name: this.state.project,
+            time: 0,
+        }
+        projects.push(newProject);
+
+        this.setState({
             project: '',
         });
     }
@@ -39,26 +57,36 @@ export default class Main extends Component {
             let dbData = snapshot.val();
             let newData = {};
             let newIds = {};
+            let projIds = {};
             for (let skill in dbData) {
                 const name = dbData[skill].name;
                 const projects = dbData[skill].projects;
                 newIds[name] = skill;
                 if(projects){
-                    newData[name] = projects;
+                    const newProjects = {}
+                    for(let proj in projects){
+                        projIds[projects[proj].name] = proj;
+                        newProjects[projects[proj].name] = projects[proj].time; 
+                        
+                    }
+                    newData[name] = newProjects;
                 }else{
                     newData[name] = {};
                 }
             }
             this.setState({
                 data: newData,
-                ids: newIds,
+                skillIds: newIds,
+                projIds: projIds,
                 
             });
         });
     }
 
+  
+
     renderData(){
-        const dataCopy = this.state.data;
+        const dataCopy = {...this.state.data};
         let renderedData = [];
         const skillKeys = Object.keys(dataCopy);
         const FORMAT = ": "
@@ -66,8 +94,9 @@ export default class Main extends Component {
             const currentSkill = skillKeys[skill];
             renderedData.push(
                 <p>
-                    {[currentSkill]}
-                    <button onClick={() => this.removeItem(this.state.ids[currentSkill])}>Remove Item</button>
+                   
+                    {currentSkill}
+                    <button onClick={() => this.removeItem(this.state.skillIds[currentSkill])}>-</button>
                 </p>
             )
             const projKeys = Object.keys(dataCopy[currentSkill])
@@ -85,10 +114,25 @@ export default class Main extends Component {
         return renderedData;
 
     }
+
+    renderSkillOptions(){
+        let options = [];
+        const dataCopy = {...this.state.data};
+        const skills = Object.keys(dataCopy);
+        skills.forEach(skill =>
+          options.push(
+              <option value={skill}>{skill}</option>
+          )  
+        );
+        return options;
+
+    }
+
     removeItem(itemId) {
         const itemRef = firebase.database().ref(`/skills/${itemId}`);
         itemRef.remove();
-      }
+    }
+
 
     render(){
         return(
@@ -99,10 +143,19 @@ export default class Main extends Component {
                     </div>
                 </header>
                 <div className='container'>
-                    <section className='add-item'></section>
+                    <section className='add-skill'></section>
                         <form onSubmit={this.handleSubmit}>
                             <input type="text" name="skill" placeholder="new skill" onChange={this.handleChange} value={this.state.skill} />
                             <button>Add Skill</button>
+                        </form>
+                    <section/>
+                    <section className='add-project'></section>
+                        <form onSubmit={this.handleAddProject}>
+                            <input type="text" name="project" placeholder="new project" onChange={this.handleChange} value={this.state.project} />
+                            <select name="skills-selector" id="skills-selector">
+                                {this.renderSkillOptions()}
+                            </select>
+                            <button>Add Project</button>
                         </form>
                     <section/>
                     {this.renderData()}

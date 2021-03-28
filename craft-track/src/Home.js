@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import firebase from './firebase.js';
 
+const INDENT = "-----";
 export default class Main extends Component {
   constructor() {
     super();
     this.state = {
         skill: '',
         project: '',
+        time: '',
         data: {},
         skillIds: {},
         projectIds: {},
@@ -14,6 +16,7 @@ export default class Main extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleAddProject = this.handleAddProject.bind(this);
+    this.handleAddTime = this.handleAddTime.bind(this);
 }
 
     handleChange(e){
@@ -38,8 +41,6 @@ export default class Main extends Component {
         e.preventDefault();
         const skillId = this.state.skillIds[document.getElementById('skills-selector').value];
         const projects = firebase.database().ref(`/skills/${skillId}/projects`);
-       // alert(projects);
-       
         const newProject = {
             name: this.state.project,
             time: 0,
@@ -49,6 +50,42 @@ export default class Main extends Component {
         this.setState({
             project: '',
         });
+    }
+
+    handleAddTime(e) {
+        e.preventDefault();
+        const projName = document.getElementById('project-selector').value;
+        const skillName = this.getSkillId(projName);
+       
+        const project = firebase.database().ref(`/skills/${this.state.skillIds[skillName]}/projects/`);
+        
+        const newTime = parseInt(this.state.time, 10)+this.state.data[skillName][projName];
+        const newProject = {
+            name: projName,
+            time: newTime,
+        }
+        project.remove();
+        project.push(newProject);
+
+        this.setState({
+            time: '',
+        });
+    }
+
+    getSkillId(projName){
+        const dataCopy = {...this.state.data};
+        for(const skill in dataCopy){
+            const projects = dataCopy[skill];
+            if(projects){
+                for( const proj in projects){
+                    if(proj === projName){
+                        return skill;
+                    }
+                }
+            }
+            
+        }
+        return "";
     }
 
     componentDidMount() {
@@ -83,8 +120,6 @@ export default class Main extends Component {
         });
     }
 
-  
-
     renderData(){
         const dataCopy = {...this.state.data};
         let renderedData = [];
@@ -96,7 +131,7 @@ export default class Main extends Component {
                 <p>
                    
                     {currentSkill}
-                    <button onClick={() => this.removeItem(this.state.skillIds[currentSkill])}>-</button>
+                    <button onClick={() => this.removeSkill(this.state.skillIds[currentSkill])}>-</button>
                 </p>
             )
             const projKeys = Object.keys(dataCopy[currentSkill])
@@ -104,9 +139,11 @@ export default class Main extends Component {
                 const currentProject = projKeys[project];
                 renderedData.push(
                 <p>
+                    {INDENT}
                     {currentProject}
                     {FORMAT}
                     {dataCopy[currentSkill][currentProject]}
+                    <button onClick={() => this.removeProject(this.state.skillIds[currentSkill],this.state.projIds[currentProject])}>-</button>
                 </p>
                 )
             }
@@ -120,16 +157,37 @@ export default class Main extends Component {
         const dataCopy = {...this.state.data};
         const skills = Object.keys(dataCopy);
         skills.forEach(skill =>
-          options.push(
-              <option value={skill}>{skill}</option>
-          )  
+            options.push(
+                <option value={skill}>{skill}</option>
+            )  
         );
         return options;
-
     }
 
-    removeItem(itemId) {
-        const itemRef = firebase.database().ref(`/skills/${itemId}`);
+    renderProjectOptions(){
+        let options = [];
+        const dataCopy = {...this.state.data};
+        for(const skill in dataCopy){
+            const projects = dataCopy[skill];
+            if(projects){
+                for( const proj in projects){
+                    options.push(
+                        <option value={proj}>{proj}</option>
+                    )
+                }
+            }
+            
+        }
+        return options;
+    }
+
+    removeSkill(skillId) {
+        const itemRef = firebase.database().ref(`/skills/${skillId}`);
+        itemRef.remove();
+    }
+
+    removeProject(skillId, projId) {
+        const itemRef = firebase.database().ref(`/skills/${skillId}/projects/${projId}`);
         itemRef.remove();
     }
 
@@ -156,6 +214,15 @@ export default class Main extends Component {
                                 {this.renderSkillOptions()}
                             </select>
                             <button>Add Project</button>
+                        </form>
+                    <section/>
+                    <section className='add-time'></section>
+                        <form onSubmit={this.handleAddTime}>
+                            <input type="number" name="time" placeholder="add time" onChange={this.handleChange} value={this.state.time} />
+                            <select name="project-selector" id="project-selector">
+                                {this.renderProjectOptions()}
+                            </select>
+                            <button>Add Time</button>
                         </form>
                     <section/>
                     {this.renderData()}

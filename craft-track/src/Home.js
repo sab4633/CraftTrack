@@ -61,11 +61,12 @@ export default class Main extends Component {
        
         const project = firebase.database().ref(`/skills/${this.state.skillIds[skillName]}/projects/`);
         
-        const newTime = parseInt(this.state.time, 10)+this.state.data[skillName][projName];
+        const newTime = parseFloat(this.state.time)+this.state.data[skillName][projName];
         const newProject = {
             name: projName,
             time: newTime,
         }
+        
         project.remove();
         project.push(newProject);
 

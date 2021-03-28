@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "react-d3-radar": "^1.0.0-rc6"
+  }
+}

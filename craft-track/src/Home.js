@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import firebase from './firebase.js';
 
 const INDENT = "-----";
+const INITIAL_TIME = 0;
+
 export default class Main extends Component {
   constructor() {
     super();
@@ -43,7 +45,7 @@ export default class Main extends Component {
         const projects = firebase.database().ref(`/skills/${skillId}/projects`);
         const newProject = {
             name: this.state.project,
-            time: 0,
+            time: INITIAL_TIME,
         }
         projects.push(newProject);
 

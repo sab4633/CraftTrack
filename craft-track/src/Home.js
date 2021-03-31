@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import firebase from './firebase.js';
-import RadarChart from './RadarChart';
+import RadarChart from './DisplayData';
+import DisplayData from './DisplayData';
 
 const INDENT = "-----";
 const INITIAL_TIME = 0;
@@ -231,7 +232,7 @@ export default class Main extends Component {
                         </form>
                     <section/>
                     {this.renderData()}
-                    <RadarChart/>
+                    <DisplayData/>
                 </div>
             </div>
             

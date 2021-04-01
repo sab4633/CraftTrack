@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import firebase from './firebase.js';
-import Radar from 'react-d3-radar';
-import Radarchart from 'react-svg-radar-chart';
-import 'react-svg-radar-chart/build/css/index.css'
-
-
+import {Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis} from 'recharts';
 
 const data = [
     {
@@ -133,13 +129,36 @@ export default class DisplayData extends Component {
             Programming: 'Programming',
             Film: 'Film',
         }
+        const data = [
+            {
+                subject: 'Math', A: 120, B: 110, fullMark: 150,
+            },
+            {
+                subject: 'Chinese', A: 98, B: 130, fullMark: 150,
+            },
+            {
+                subject: 'English', A: 86, B: 130, fullMark: 150,
+            },
+            {
+                subject: 'Geography', A: 99, B: 100, fullMark: 150,
+            },
+            {
+                subject: 'Physics', A: 85, B: 90, fullMark: 150,
+            },
+            {
+                subject: 'History', A: 65, B: 85, fullMark: 150,
+            },
+        ];
+
         return( 
-            <div>
-                <Radarchart
-                    captions={this.state.captions}
-                    data={this.state.skillsArray}
-                    size={450}
-                />
+            
+            <div>]
+                <RadarChart cx={300} cy={250} outerRadius={150} width={500} height={500} data={data}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="subject" />
+                    <PolarRadiusAxis />
+                    <Radar name="Mike" dataKey="B" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+			    </RadarChart>
             </div>
         );
     }

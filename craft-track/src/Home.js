@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import firebase from './firebase.js';
+import RadarChart from './DisplayData';
+import DisplayData from './DisplayData';
 
 const INDENT = "-----";
 const INITIAL_TIME = 0;
@@ -61,11 +63,13 @@ export default class Main extends Component {
        
         const project = firebase.database().ref(`/skills/${this.state.skillIds[skillName]}/projects/`);
         
-        const newTime = parseInt(this.state.time, 10)+this.state.data[skillName][projName];
+        const newTime = parseFloat(this.state.time)+this.state.data[skillName][projName];
+        
         const newProject = {
             name: projName,
             time: newTime,
         }
+        
         project.remove();
         project.push(newProject);
 
@@ -228,6 +232,7 @@ export default class Main extends Component {
                         </form>
                     <section/>
                     {this.renderData()}
+                    <DisplayData/>
                 </div>
             </div>
             

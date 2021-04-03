@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "chart.js": "^2.9.4",
+    "react-d3-radar": "^1.0.0-rc6",
+    "react-svg-radar-chart": "^1.2.0",
+    "recharts": "^2.0.9"
+  }
+}
